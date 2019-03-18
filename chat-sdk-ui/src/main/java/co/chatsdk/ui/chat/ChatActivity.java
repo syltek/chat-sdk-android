@@ -12,12 +12,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +28,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import co.chatsdk.core.audio.Recording;
 import co.chatsdk.core.dao.Message;
 import co.chatsdk.core.dao.Thread;
@@ -174,12 +175,14 @@ public class ChatActivity extends BaseActivity implements TextInputDelegate, Cha
         return super.getTaskDescriptionBitmap();
     }
 
+    @Nullable
     protected ActionBar readyActionBarToCustomView () {
         ActionBar ab = getSupportActionBar();
-        ab.setDisplayShowHomeEnabled(false);
-        ab.setDisplayShowTitleEnabled(false);
-        ab.setDisplayShowCustomEnabled(true);
-
+        if (ab != null) {
+            ab.setDisplayShowHomeEnabled(false);
+            ab.setDisplayShowTitleEnabled(false);
+            ab.setDisplayShowCustomEnabled(true);
+        }
         return ab;
     }
 
@@ -189,30 +192,32 @@ public class ChatActivity extends BaseActivity implements TextInputDelegate, Cha
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 
             final ActionBar ab = readyActionBarToCustomView();
-            /*
-             * http://stackoverflow.com/questions/16026818/actionbar-custom-view-with-centered-imageview-action-items-on-sides
-             */
+            if (ab != null) {
+                /*
+                 * http://stackoverflow.com/questions/16026818/actionbar-custom-view-with-centered-imageview-action-items-on-sides
+                 */
 
-            actionBarView = getLayoutInflater().inflate(R.layout.chat_sdk_actionbar_chat_activity, null);
+                actionBarView = getLayoutInflater().inflate(R.layout.chat_sdk_actionbar_chat_activity, null);
 
-            actionBarView.setOnClickListener(v -> {
-                if (ChatSDK.config().threadDetailsEnabled) {
-                    openThreadDetailsActivity();
-                }
-            });
+                actionBarView.setOnClickListener(v -> {
+                    if (ChatSDK.config().threadDetailsEnabled) {
+                        openThreadDetailsActivity();
+                    }
+                });
 
-            TextView textView = actionBarView.findViewById(R.id.tvName);
+                TextView textView = actionBarView.findViewById(R.id.tvName);
 
-            String displayName = Strings.nameForThread(thread);
-            setTitle(displayName);
-            textView.setText(displayName);
+                String displayName = Strings.nameForThread(thread);
+                setTitle(displayName);
+                textView.setText(displayName);
 
-            subtitleTextView = actionBarView.findViewById(R.id.tvSubtitle);
+                subtitleTextView = actionBarView.findViewById(R.id.tvSubtitle);
 
-            final SimpleDraweeView circleImageView = actionBarView.findViewById(R.id.ivAvatar);
-            ThreadImageBuilder.load(circleImageView, thread);
+                final SimpleDraweeView circleImageView = actionBarView.findViewById(R.id.ivAvatar);
+                ThreadImageBuilder.load(circleImageView, thread);
 
-            ab.setCustomView(actionBarView);
+                ab.setCustomView(actionBarView);
+            }
         }
     }
 
